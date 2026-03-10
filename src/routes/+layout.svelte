@@ -38,7 +38,7 @@
 	</a>
 	<span class="footer-divider">·</span>
 	<a
-		href="https://huggingface.co/spaces/angel-721/Song-Genere-Classifer"
+		href="https://huggingface.co/spaces/angel-721/song-genre-classifier"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="footer-link"
