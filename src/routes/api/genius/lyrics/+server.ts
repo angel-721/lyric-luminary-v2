@@ -3,11 +3,27 @@ import type { RequestHandler } from "./$types";
 import { JSDOM } from "jsdom";
 
 async function scrapeLyrics(songUrl: string): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
   const response = await fetch(songUrl, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Referer": "https://genius.com/",
+      "DNT": "1",
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-User": "?1",
+      "Cache-Control": "max-age=0",
     },
-  });
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timeoutId));
 
   if (!response.ok) {
     throw new Error(`Failed to fetch song page: ${response.status}`);
@@ -96,6 +112,32 @@ export const GET: RequestHandler = async ({ url }: { url: URL }) => {
     return json({ lyrics });
   } catch (e) {
     console.error("Genius lyrics fetch error:", e);
-    return json({ error: e instanceof Error ? e.message : "Could not fetch lyrics. Try again." }, { status: 500 });
+
+    // Check if this looks like a blocking error
+    const isBlockedError = e instanceof Error && (
+      e.message.includes('blocking') ||
+      e.message.includes('403') ||
+      e.message.includes('rate limit') ||
+      e.message.includes('Failed to fetch') && !e.message.includes('timeout')
+    );
+
+    if (isBlockedError) {
+      return json({
+        blocked: true,
+        message: "Genius is being a bit dramatic and won't let me grab those lyrics for you 😢",
+        geniusUrl: songUrl
+      }, { status: 202 }); // Using 202 Accepted to indicate "we acknowledge but can't fulfill"
+    }
+
+    let errorMessage = "Could not fetch lyrics. Try again.";
+    if (e instanceof Error) {
+      if (e.name === 'AbortError') {
+        errorMessage = "Request timed out. The song page took too long to load.";
+      } else {
+        errorMessage = e.message;
+      }
+    }
+
+    return json({ error: errorMessage }, { status: 500 });
   }
 };
