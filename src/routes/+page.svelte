@@ -197,12 +197,15 @@
 		position: relative;
 		z-index: 1;
 		width: 100%;
+		max-width: 580px;
 		min-height: 100vh;
 		display: block;
+		margin: 0 auto;
 	}
 
 	.container-inner {
 		width: 100%;
+		max-width: 580px;
 		min-height: 100vh;
 		padding: 2rem 1rem;
 		display: flex;

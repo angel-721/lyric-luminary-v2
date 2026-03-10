@@ -24,6 +24,8 @@
 		display: flex;
 		flex-direction: column;
 		padding: 2rem 1rem;
+		max-width: 580px;
+		margin: 0 auto;
 	}
 
 	.back-link {
