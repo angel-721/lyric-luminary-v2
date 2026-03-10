@@ -3,7 +3,7 @@
 	import GeniusInput from '$lib/components/GeniusInput.svelte';
 	import Bulb from '$lib/components/Bulb.svelte';
 	import Result from '$lib/components/Result.svelte';
-	import { SendAlt, ArrowUpRight, Sun, Moon } from 'carbon-icons-svelte';
+	import { SendAlt, ArrowUpRight, Sun, Moon, Reset } from 'carbon-icons-svelte';
 	import { theme, toggleTheme } from '$lib/stores/theme';
 
 	let activeTab = $state<'paste' | 'genius'>('genius');
@@ -62,13 +62,18 @@
 		lyrics = '';
 		predictedGenre = null;
 		errorMessage = null;
+		activeTab = 'genius';
 	}
+
+	$derived isLocked = predictedGenre !== null;
 </script>
 
 <svelte:head>
 	<title>Lyric Luminary</title>
 	<meta name="description" content="Predict music genres from song lyrics" />
 </svelte:head>
+
+<div class="light-cone" class:predicting={isLoading} class:predicted={predictedGenre !== null}></div>
 
 <div class="container">
 	<div class="top-links">
@@ -86,50 +91,56 @@
 	</div>
 
 	<header class="header">
+		<Bulb state={isLoading ? 'predicting' : predictedGenre ? 'predicted' : 'idle'} />
 		<h1>Lyric Luminary</h1>
 		<p class="subtitle">Predict music genres from song lyrics</p>
 	</header>
 
-	<div class="tabs">
-		<button
-			class="tab"
-			class:active={activeTab === 'paste'}
-			onclick={() => (activeTab = 'paste')}
-		>
-			Paste Lyrics
-		</button>
-		<button
-			class="tab"
-			class:active={activeTab === 'genius'}
-			onclick={() => (activeTab = 'genius')}
-		>
-			Genius Search
-		</button>
-	</div>
+	{#if !isLocked}
+		<div class="tabs">
+			<button
+				class="tab"
+				class:active={activeTab === 'paste'}
+				onclick={() => (activeTab = 'paste')}
+			>
+				Paste Lyrics
+			</button>
+			<button
+				class="tab"
+				class:active={activeTab === 'genius'}
+				onclick={() => (activeTab = 'genius')}
+			>
+				Genius Search
+			</button>
+		</div>
+	{/if}
 
 	<main class="main-content">
-		{#if activeTab === 'paste'}
-			{@const lyricError = errorMessage ? 'Lyrics cannot be empty' : ''}
-			<LyricInput bind:lyrics error={lyricError} />
+		{#if !isLocked}
+			{#if activeTab === 'paste'}
+				<LyricInput bind:lyrics error={errorMessage} />
+			{:else}
+				<GeniusInput onFetch={handleGeniusFetch} />
+			{/if}
 		{:else}
-			<GeniusInput onFetch={handleGeniusFetch} />
-		{/if}
-
-		{#if !isLoading && !predictedGenre}
-			<div class="submit-container">
-				<button
-					onclick={handleSubmit}
-					disabled={!lyrics.trim() || isLoading}
-					class="submit-button"
-				>
-					<SendAlt size={24} />
-					<span>Predict Genre</span>
-				</button>
+			<div class="locked-lyrics">
+				{lyrics}
 			</div>
 		{/if}
 
-		{#if isLoading}
-			<Bulb />
+		{#if !isLocked}
+			{#if !isLoading}
+				<div class="submit-container">
+					<button
+						onclick={handleSubmit}
+						disabled={!lyrics.trim() || isLoading}
+						class="submit-button"
+					>
+						<SendAlt size={24} />
+						<span>Predict Genre</span>
+					</button>
+				</div>
+			{/if}
 		{/if}
 
 		{#if predictedGenre || errorMessage}
@@ -139,7 +150,8 @@
 		{#if predictedGenre}
 			<div class="reset-container">
 				<button onclick={resetForm} class="reset-button">
-					Predict Another Song
+					<Reset size={16} />
+					<span>Predict Another Song</span>
 				</button>
 			</div>
 		{/if}
@@ -147,14 +159,45 @@
 </div>
 
 <style>
+	.light-cone {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 100vh;
+		background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--accent) 0%, transparent 70%);
+		opacity: 0;
+		pointer-events: none;
+		z-index: 0;
+		transition: opacity 0.6s ease-in-out;
+	}
+
+	.light-cone.predicting {
+		animation: pulse-cone 1.2s ease-in-out infinite;
+	}
+
+	.light-cone.predicted {
+		opacity: 0.4;
+	}
+
+	@keyframes pulse-cone {
+		0%, 100% {
+			opacity: 0.3;
+		}
+		50% {
+			opacity: 0.6;
+		}
+	}
+
 	.container {
+		position: relative;
+		z-index: 1;
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		padding: 2rem 1rem;
-		position: relative;
 	}
 
 	.top-links {
@@ -169,7 +212,7 @@
 	.theme-toggle {
 		padding: 0.5rem;
 		background-color: transparent;
-		color: #999;
+		color: var(--subtext);
 		border: none;
 		cursor: pointer;
 		display: flex;
@@ -186,7 +229,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		color: #999;
+		color: var(--subtext);
 		text-decoration: none;
 		font-size: 0.875rem;
 		font-weight: 500;
@@ -200,6 +243,10 @@
 	.header {
 		text-align: center;
 		margin-bottom: 2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.header h1 {
@@ -211,7 +258,7 @@
 
 	.subtitle {
 		font-size: 1.125rem;
-		color: #999;
+		color: var(--subtext);
 		margin: 0;
 	}
 
@@ -219,7 +266,7 @@
 		display: flex;
 		gap: 0.5rem;
 		margin-bottom: 2rem;
-		background-color: #1a1a1a;
+		background-color: var(--surface);
 		padding: 0.25rem;
 		border-radius: 8px;
 	}
@@ -227,7 +274,7 @@
 	.tab {
 		padding: 0.75rem 1.5rem;
 		background-color: transparent;
-		color: #999;
+		color: var(--subtext);
 		border: none;
 		border-radius: 6px;
 		cursor: pointer;
@@ -302,8 +349,36 @@
 		transition: all 0.2s;
 	}
 
+	.reset-button {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background-color: transparent;
+		color: var(--subtext);
+		border: none;
+		border-radius: 4px;
+		font-family: 'IBM Plex Sans', sans-serif;
+		font-size: 0.875rem;
+		cursor: pointer;
+		transition: color 0.2s;
+	}
+
 	.reset-button:hover {
-		background-color: var(--accent);
-		color: var(--bg);
+		color: var(--accent);
+	}
+
+	.locked-lyrics {
+		width: 100%;
+		padding: 1.5rem;
+		background-color: var(--surface);
+		color: var(--text);
+		border-radius: 8px;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 0.875rem;
+		line-height: 1.6;
+		white-space: pre-wrap;
+		overflow-y: auto;
+		max-height: 400px;
 	}
 </style>

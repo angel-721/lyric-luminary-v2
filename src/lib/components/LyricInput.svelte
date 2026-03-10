@@ -35,7 +35,7 @@
 		padding: 1rem;
 		background-color: var(--bg);
 		color: var(--text);
-		border: 2px solid #333;
+		border: 2px solid var(--overlay);
 		border-radius: 8px;
 		font-family: 'IBM Plex Sans', monospace;
 		font-size: 0.875rem;
@@ -50,12 +50,12 @@
 	}
 
 	.lyric-textarea::placeholder {
-		color: #666;
+		color: var(--subtext);
 	}
 
 	.error-message {
 		margin-top: 0.5rem;
-		color: #ef4444;
+		color: var(--accent-dim);
 		font-size: 0.875rem;
 	}
 </style>

@@ -45,18 +45,14 @@
 		const target = e.target as HTMLInputElement;
 		searchQuery = target.value;
 
+		if (debounceTimer) {
+			clearTimeout(debounceTimer);
+		}
+
 		if (!searchQuery.trim()) {
 			searchResults = [];
 			errorMessage = '';
-			if (debounceTimer) {
-				clearTimeout(debounceTimer);
-				debounceTimer = null;
-			}
 			return;
-		}
-
-		if (debounceTimer) {
-			clearTimeout(debounceTimer);
 		}
 
 		if (searchQuery.trim().length >= 2) {
@@ -166,7 +162,7 @@
 		padding: 0.75rem 3rem 0.75rem 1rem;
 		background-color: var(--bg);
 		color: var(--text);
-		border: 2px solid #333;
+		border: 2px solid var(--overlay);
 		border-radius: 8px;
 		font-family: 'IBM Plex Sans', sans-serif;
 		font-size: 0.875rem;
@@ -184,7 +180,7 @@
 	}
 
 	.search-input::placeholder {
-		color: #666;
+		color: var(--subtext);
 	}
 
 	.search-icon {
@@ -192,7 +188,7 @@
 		right: 0.5rem;
 		top: 50%;
 		transform: translateY(-50%);
-		color: #999;
+		color: var(--subtext);
 		pointer-events: none;
 	}
 
@@ -208,7 +204,7 @@
 
 	.error-message {
 		margin-top: 0.75rem;
-		color: #ef4444;
+		color: var(--accent-dim);
 		font-size: 0.875rem;
 	}
 
@@ -231,11 +227,11 @@
 	}
 
 	.result-row:hover:not(.loading) {
-		background-color: rgba(255, 255, 255, 0.05);
+		background-color: var(--surface);
 	}
 
 	.result-row:active:not(.loading) {
-		background-color: rgba(255, 255, 255, 0.08);
+		background-color: var(--overlay);
 	}
 
 	.result-row.loading {
@@ -254,7 +250,7 @@
 	.thumbnail-placeholder {
 		width: 48px;
 		height: 48px;
-		background-color: #1a1a1a;
+		background-color: var(--surface);
 		border-radius: 4px;
 		flex-shrink: 0;
 	}
@@ -277,7 +273,7 @@
 	.song-artist {
 		font-family: 'IBM Plex Sans', sans-serif;
 		font-size: 0.75rem;
-		color: rgba(240, 237, 232, 0.5);
+		color: var(--subtext);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -285,7 +281,7 @@
 	}
 
 	.chevron-icon {
-		color: #666;
+		color: var(--overlay);
 		flex-shrink: 0;
 	}
 
@@ -298,14 +294,14 @@
 	.row-error {
 		margin-left: 3.25rem;
 		margin-top: 0.25rem;
-		color: #ef4444;
+		color: var(--accent-dim);
 		font-size: 0.75rem;
 	}
 
 	.no-results {
 		margin-top: 1rem;
 		text-align: center;
-		color: #999;
+		color: var(--subtext);
 		font-size: 0.875rem;
 	}
 </style>
