@@ -364,24 +364,6 @@
 		transition: all 0.2s;
 	}
 
-	.reset-button {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
-		background-color: transparent;
-		color: var(--subtext);
-		border: none;
-		border-radius: 4px;
-		font-family: 'IBM Plex Sans', sans-serif;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: color 0.2s;
-	}
-
-	.reset-button:hover {
-		color: var(--accent);
-	}
 
 	.locked-lyrics {
 		width: 100%;
