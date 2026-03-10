@@ -6,7 +6,6 @@
 	import { SendAlt, ArrowUpRight, Sun, Moon } from 'carbon-icons-svelte';
 	import { theme, toggleTheme } from '$lib/stores/theme';
 
-	// State
 	let activeTab = $state<'paste' | 'genius'>('genius');
 	let lyrics = $state('');
 	let isLoading = $state(false);
@@ -14,7 +13,6 @@
 	let errorMessage = $state<string | null>(null);
 	let currentTheme = $state<'dark' | 'light'>('dark');
 
-	// Subscribe to theme store
 	theme.subscribe((t) => (currentTheme = t));
 
 	function handleToggleTheme() {
@@ -24,7 +22,6 @@
 	async function handleSubmit() {
 		errorMessage = null;
 
-		// Validate lyrics
 		if (!lyrics.trim()) {
 			errorMessage = 'Lyrics cannot be empty';
 			return;

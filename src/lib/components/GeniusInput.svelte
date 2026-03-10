@@ -45,7 +45,6 @@
 		const target = e.target as HTMLInputElement;
 		searchQuery = target.value;
 
-		// Clear results immediately if input is empty
 		if (!searchQuery.trim()) {
 			searchResults = [];
 			errorMessage = '';
@@ -56,12 +55,10 @@
 			return;
 		}
 
-		// Clear existing timer
 		if (debounceTimer) {
 			clearTimeout(debounceTimer);
 		}
 
-		// Only search if at least 2 characters
 		if (searchQuery.trim().length >= 2) {
 			debounceTimer = setTimeout(() => {
 				handleSearch();
@@ -81,9 +78,7 @@
 				errorMessage = data.error;
 				selectedSongId = null;
 			} else {
-				// Success! Switch to paste lyrics tab and populate
 				onFetch(data.lyrics);
-				// Clear search state
 				searchQuery = '';
 				searchResults = [];
 			}
@@ -208,16 +203,6 @@
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
-		}
-	}
-
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.5;
 		}
 	}
 

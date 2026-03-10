@@ -1,5 +1,4 @@
 <script lang="ts">
-	// No props needed - this is just an animated visual element
 </script>
 
 <div class="bulb-container">

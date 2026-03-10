@@ -12,13 +12,11 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Lyrics are required' }, { status: 400 });
 		}
 
-		// Trim and validate lyrics
 		const trimmedLyrics = song_lyrics.trim();
 		if (trimmedLyrics.length === 0) {
 			return json({ error: 'Lyrics cannot be empty' }, { status: 400 });
 		}
 
-		// Proxy to HuggingFace FastAPI endpoint
 		const response = await fetch(`${HUGGING_FACE_URL}/predict`, {
 			method: 'POST',
 			headers: {
@@ -37,7 +35,6 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const data = await response.json();
 
-		// Validate genre
 		const validGenres = ['country', 'hip-hop', 'metal', 'pop', 'rock'];
 		const genre = data.genre?.toLowerCase();
 
@@ -45,7 +42,6 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: 'Invalid prediction result.' }, { status: 500 });
 		}
 
-		// Capitalize first letter for display
 		const formattedGenre = genre.charAt(0).toUpperCase() + genre.slice(1);
 
 		return json({ genre: formattedGenre });

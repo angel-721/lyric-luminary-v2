@@ -27,11 +27,9 @@ async function scrapeLyrics(songUrl: string): Promise<string> {
 
   const lyrics = containers
     .map((container) => {
-      // Convert <br> tags to newlines
       container.querySelectorAll("br").forEach((br) => {
         br.replaceWith(dom.window.document.createTextNode("\n"));
       });
-      // Add newlines after <div> tags for stanza separation
       container.querySelectorAll("div").forEach((div) => {
         div.insertAdjacentText("afterend", "\n");
       });
@@ -49,34 +47,26 @@ async function scrapeLyrics(songUrl: string): Promise<string> {
   const filteredLines = lines.filter((line) => {
     const trimmed = line.trim();
 
-    // Remove empty lines
     if (!trimmed) return true;
 
-    // Remove section markers (Verse, Chorus, Bridge, etc.)
     if (trimmed.match(/^\[.*?\]$/)) return false;
 
-    // Remove contributors section
     if (trimmed.match(/^\d+\s+(Contributors|contributor)/i)) return false;
     if (trimmed.match(/Contributors/i)) return false;
 
-    // Remove song bio/description text
     if (trimmed.includes("This song is about")) return false;
     if (trimmed.includes("Read More")) return false;
     if (trimmed.includes("…")) return false;
     if (trimmed.includes("Read more on Genius")) return false;
 
-    // Remove lines that look like bios or descriptions
     if (trimmed.match(/^(This song|The song|It's about|They're about)/i)) return false;
     if (trimmed.match(/(written|produced|performed|recorded)/i)) return false;
 
-    // Remove song title if it appears at the start (first few lines)
     const titleMatch = containers[0]?.textContent?.trim().split("\n")[0];
     if (titleMatch && trimmed === titleMatch && lines.indexOf(line) < 5) return false;
 
-    // Remove lines that are too long to be lyrics (likely descriptions)
     if (trimmed.length > 200) return false;
 
-    // Remove lines with URLs or copyright symbols
     if (trimmed.includes("http") || trimmed.includes("©") || trimmed.includes("©")) return false;
 
     return true;
