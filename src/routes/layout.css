@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+:root {
+	--bg: #0f0f0f;
+	--text: #f0ede8;
+	--accent: #f5a623;
+}
+
+.light {
+	--bg: #f5f0e8;
+	--text: #1a1a1a;
+	--accent: #c47d0e;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: var(--bg);
+	color: var(--text);
+	font-family: 'IBM Plex Sans', sans-serif;
+	min-height: 100vh;
+}
