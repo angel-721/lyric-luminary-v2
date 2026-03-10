@@ -19,17 +19,28 @@
 	--overlay: #ccd0da;
 }
 
-* {
+*, *::before, *::after {
 	box-sizing: border-box;
+}
+
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	min-height: 100%;
 }
 
 body {
 	margin: 0;
 	padding: 0;
+	width: 100% !important;
+	max-width: 100% !important;
+	min-height: 100vh;
 	background-color: var(--bg);
 	color: var(--text);
 	font-family: 'IBM Plex Sans', sans-serif;
-	min-height: 100vh;
+	overflow-x: hidden;
+	display: block;
 }
 
 .footer {

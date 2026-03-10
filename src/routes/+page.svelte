@@ -94,7 +94,7 @@
 			<ArrowUpRight size={20} />
 		</a>
 	</div>
-
+	<div class="container-inner">
 	<header class="header">
 		<Bulb state={isLoading ? 'predicting' : predictedGenre ? 'predicted' : 'idle'} />
 		<h1>Lyric Luminary</h1>
@@ -159,6 +159,7 @@
 			</div>
 		{/if}
 	</main>
+	</div>
 </div>
 
 <style>
@@ -195,12 +196,20 @@
 	.container {
 		position: relative;
 		z-index: 1;
+		width: 100%;
 		min-height: 100vh;
+		display: block;
+	}
+
+	.container-inner {
+		width: 100%;
+		min-height: 100vh;
+		padding: 2rem 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 2rem 1rem;
+		margin: 0 auto;
 	}
 
 	.top-links {

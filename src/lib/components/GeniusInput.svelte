@@ -95,11 +95,13 @@
 			class="search-input"
 			disabled={isSearching}
 		/>
-		{#if isSearching}
-			<InProgress size={20} class="search-icon spinning" />
-		{:else}
-			<Search size={20} class="search-icon" />
-		{/if}
+			<span class="search-icon" class:spinning={isSearching}>
+			{#if isSearching}
+				<InProgress size={20} />
+			{:else}
+				<Search size={20} />
+			{/if}
+		</span>
 	</div>
 
 	{#if errorMessage && !selectedSongId}
@@ -128,11 +130,12 @@
 						<div class="song-artist">{song.artist}</div>
 					</div>
 
-					{#if selectedSongId === song.id}
-						<InProgress size={20} class="loading-icon" />
-					{:else}
-						<ChevronRight size={20} class="chevron-icon" />
-					{/if}
+						<span class="chevron-icon" class:hidden={selectedSongId === song.id}>
+						<ChevronRight size={20} />
+					</span>
+					<span class="loading-icon" class:hidden={selectedSongId !== song.id}>
+						<InProgress size={20} />
+					</span>
 				</div>
 
 				{#if selectedSongId === song.id && errorMessage}
@@ -190,6 +193,10 @@
 		transform: translateY(-50%);
 		color: var(--subtext);
 		pointer-events: none;
+	}
+
+	.hidden {
+		display: none !important;
 	}
 
 	.spinning {

@@ -26,8 +26,9 @@
 {@render children()}
 
 <footer class="footer">
+	<!-- TODO: Update with real GitHub repository URL -->
 	<a
-		href="#"
+		href="https://github.com/angel-721/lyric-luminary"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="footer-link"
@@ -37,8 +38,9 @@
 		<span>Source</span>
 	</a>
 	<span class="footer-divider">·</span>
+	<!-- TODO: Update with real HuggingFace Space URL -->
 	<a
-		href="#"
+		href="https://huggingface.co/spaces"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="footer-link"
