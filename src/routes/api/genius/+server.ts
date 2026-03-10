@@ -1,6 +1,7 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import Genius from "genius-lyrics";
+import { request } from "undici";
 
 export const GET: RequestHandler = async ({ url }: { url: URL }) => {
   try {
@@ -10,8 +11,17 @@ export const GET: RequestHandler = async ({ url }: { url: URL }) => {
       return json({ error: "Search query is required" }, { status: 400 });
     }
 
-    const geniusClient = new Genius.Client();
-    const searches = await geniusClient.songs.search(query);
+    const client = new Genius.Client();
+    client.request.get = async (url: string): Promise<string> => {
+      const res = await request(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        },
+      });
+      return await res.body.text();
+    };
+
+    const searches = await client.songs.search(query);
 
     if (!searches || searches.length === 0) {
       return json({ results: [] });
