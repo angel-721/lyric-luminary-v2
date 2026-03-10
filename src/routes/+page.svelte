@@ -12,6 +12,7 @@
 	let predictedGenre = $state<string | null>(null);
 	let errorMessage = $state<string | null>(null);
 	let currentTheme = $state<'dark' | 'light'>('dark');
+	let geniusMetadata = $state<{ title: string; artist: string; thumbnail: string } | null>(null);
 
 	theme.subscribe((t) => (currentTheme = t));
 
@@ -53,8 +54,11 @@
 		}
 	}
 
-	function handleGeniusFetch(fetchedLyrics: string) {
+	function handleGeniusFetch(fetchedLyrics: string, song?: { title: string; artist: string; thumbnail: string }) {
 		lyrics = fetchedLyrics;
+		if (song) {
+			geniusMetadata = { title: song.title, artist: song.artist, thumbnail: song.thumbnail };
+		}
 		activeTab = 'paste';
 	}
 
@@ -62,10 +66,11 @@
 		lyrics = '';
 		predictedGenre = null;
 		errorMessage = null;
+		geniusMetadata = null;
 		activeTab = 'genius';
 	}
 
-	$derived isLocked = predictedGenre !== null;
+	const isLocked = $derived(predictedGenre !== null);
 </script>
 
 <svelte:head>
@@ -96,24 +101,22 @@
 		<p class="subtitle">Predict music genres from song lyrics</p>
 	</header>
 
-	{#if !isLocked}
-		<div class="tabs">
-			<button
-				class="tab"
-				class:active={activeTab === 'paste'}
-				onclick={() => (activeTab = 'paste')}
-			>
-				Paste Lyrics
-			</button>
-			<button
-				class="tab"
-				class:active={activeTab === 'genius'}
-				onclick={() => (activeTab = 'genius')}
-			>
-				Genius Search
-			</button>
-		</div>
-	{/if}
+	<div class="tabs">
+		<button
+			class="tab"
+			class:active={activeTab === 'paste'}
+			onclick={() => (activeTab = 'paste')}
+		>
+			Paste Lyrics
+		</button>
+		<button
+			class="tab"
+			class:active={activeTab === 'genius'}
+			onclick={() => (activeTab = 'genius')}
+		>
+			Genius Search
+		</button>
+	</div>
 
 	<main class="main-content">
 		{#if !isLocked}
@@ -144,7 +147,7 @@
 		{/if}
 
 		{#if predictedGenre || errorMessage}
-			<Result genre={predictedGenre} error={errorMessage} />
+			<Result genre={predictedGenre} error={errorMessage} {geniusMetadata} />
 		{/if}
 
 		{#if predictedGenre}

@@ -3,7 +3,7 @@
 		state: 'idle' | 'predicting' | 'predicted';
 	}
 
-	let { state = $props() }: Props;
+	let { state }: Props = $props();
 </script>
 
 <div class="bulb-container" class:predicting={state === 'predicting'} class:predicted={state === 'predicted'}>

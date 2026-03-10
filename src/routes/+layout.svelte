@@ -1,5 +1,6 @@
 <script lang="ts">
 	import './layout.css';
+	import { LogoGithub, MachineLearning, DataBase } from 'carbon-icons-svelte';
 
 	let { children } = $props();
 </script>
@@ -23,3 +24,38 @@
 </svelte:head>
 
 {@render children()}
+
+<footer class="footer">
+	<a
+		href="#"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="footer-link"
+		aria-label="View source on GitHub"
+	>
+		<LogoGithub size={16} />
+		<span>Source</span>
+	</a>
+	<span class="footer-divider">·</span>
+	<a
+		href="#"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="footer-link"
+		aria-label="View HuggingFace Space"
+	>
+		<MachineLearning size={16} />
+		<span>HuggingFace Space</span>
+	</a>
+	<span class="footer-divider">·</span>
+	<a
+		href="https://www.kaggle.com/datasets/mateibejan/multilingual-lyrics-for-genre-classification"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="footer-link"
+		aria-label="View dataset on Kaggle"
+	>
+		<DataBase size={16} />
+		<span>Dataset</span>
+	</a>
+</footer>

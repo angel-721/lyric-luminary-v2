@@ -2,7 +2,7 @@
 	import { Search, ChevronRight, InProgress } from 'carbon-icons-svelte';
 
 	interface Props {
-		onFetch: (lyrics: string) => void;
+		onFetch: (lyrics: string, song?: { title: string; artist: string; thumbnail: string }) => void;
 	}
 
 	let { onFetch }: Props = $props();
@@ -74,7 +74,7 @@
 				errorMessage = data.error;
 				selectedSongId = null;
 			} else {
-				onFetch(data.lyrics);
+				onFetch(data.lyrics, { title: song.title, artist: song.artist, thumbnail: song.thumbnail });
 				searchQuery = '';
 				searchResults = [];
 			}
