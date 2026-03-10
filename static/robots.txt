@@ -1,3 +1,33 @@
-# allow crawling everything by default
+# Block common paths targeted by malicious bots
 User-agent: *
-Disallow:
+Disallow: /wp-login.php
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /xmlrpc.php
+Disallow: /wp-content/
+Disallow: /administrator/
+Disallow: /login/
+Disallow: /admin/
+Disallow: /.env
+Disallow: /config.php
+Disallow: /phpmyadmin/
+Disallow: /mysql/
+Disallow: /sql/
+
+# Slow down aggressive crawlers
+Crawl-delay: 1
+
+# Disallow common bot scanning paths
+Disallow: /*?*
+Disallow: /*.php$
+Disallow: /*.sql$
+
+# Allow legitimate crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
