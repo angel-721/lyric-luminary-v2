@@ -1,13 +1,13 @@
 <script lang="ts">
 	interface Props {
 		lyrics: string;
-		error: string;
+		error: string | null;
 	}
 
-	let { lyrics = $bindable(''), error = $bindable('') }: Props = $props();
+	let { lyrics = $bindable(''), error = $bindable(null) }: Props = $props();
 
 	function clearError() {
-		error = '';
+		error = null;
 	}
 </script>
 

@@ -13,6 +13,7 @@
 	let errorMessage = $state<string | null>(null);
 	let currentTheme = $state<'dark' | 'light'>('dark');
 	let geniusMetadata = $state<{ title: string; artist: string; thumbnail: string } | null>(null);
+	let blockedState = $state<{ message: string; geniusUrl: string } | null>(null);
 
 	theme.subscribe((t) => (currentTheme = t));
 
@@ -54,10 +55,25 @@
 		}
 	}
 
-	function handleGeniusFetch(fetchedLyrics: string, song?: { title: string; artist: string; thumbnail: string }) {
-		lyrics = fetchedLyrics;
-		if (song) {
-			geniusMetadata = { title: song.title, artist: song.artist, thumbnail: song.thumbnail };
+	function handleGeniusFetch(
+		fetchedLyrics: string,
+		song?: { title: string; artist: string; thumbnail: string },
+		blocked?: { message: string; geniusUrl: string }
+	) {
+		if (blocked) {
+			// Genius is blocking us, switch to paste tab and show the card
+			blockedState = blocked;
+			if (song) {
+				geniusMetadata = { title: song.title, artist: song.artist, thumbnail: song.thumbnail };
+			}
+			lyrics = '';
+		} else {
+			// Normal fetch, set lyrics and clear blocked state
+			lyrics = fetchedLyrics;
+			blockedState = null;
+			if (song) {
+				geniusMetadata = { title: song.title, artist: song.artist, thumbnail: song.thumbnail };
+			}
 		}
 		activeTab = 'paste';
 	}
@@ -67,6 +83,7 @@
 		predictedGenre = null;
 		errorMessage = null;
 		geniusMetadata = null;
+		blockedState = null;
 		activeTab = 'genius';
 	}
 
@@ -119,6 +136,19 @@
 	</div>
 
 	<main class="main-content">
+		{#if blockedState && activeTab === 'paste'}
+			<div class="blocked-card">
+				<button class="blocked-close" onclick={() => (blockedState = null)} aria-label="Close">
+					✕
+				</button>
+				<p class="blocked-message">{blockedState.message}</p>
+				<a href={blockedState.geniusUrl} target="_blank" rel="noopener noreferrer" class="blocked-link">
+					<span>Get lyrics from Genius</span>
+					<ArrowUpRight size={16} />
+				</a>
+			</div>
+		{/if}
+
 		{#if !isLocked}
 			{#if activeTab === 'paste'}
 				<LyricInput bind:lyrics error={errorMessage} />
@@ -312,6 +342,78 @@
 	.main-content {
 		width: 100%;
 		max-width: 580px;
+	}
+
+	.blocked-card {
+		position: relative;
+		padding: 1.25rem 1rem 1rem 1rem;
+		margin-bottom: 1.5rem;
+		background-color: var(--surface);
+		border-radius: 8px;
+		border-left: 3px solid var(--accent);
+		animation: slide-in 0.3s ease-out;
+	}
+
+	.blocked-close {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		width: 24px;
+		height: 24px;
+		padding: 0;
+		background-color: transparent;
+		color: var(--subtext);
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1rem;
+		transition: all 0.2s;
+	}
+
+	.blocked-close:hover {
+		background-color: var(--overlay);
+		color: var(--text);
+	}
+
+	.blocked-message {
+		font-family: 'IBM Plex Sans', sans-serif;
+		font-size: 0.875rem;
+		color: var(--text);
+		margin: 0 0 0.75rem 0;
+		line-height: 1.5;
+	}
+
+	.blocked-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		background-color: var(--accent);
+		color: var(--bg);
+		text-decoration: none;
+		font-family: 'IBM Plex Sans', sans-serif;
+		font-size: 0.875rem;
+		font-weight: 600;
+		border-radius: 6px;
+		transition: opacity 0.2s;
+	}
+
+	.blocked-link:hover {
+		opacity: 0.9;
+	}
+
+	@keyframes slide-in {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.submit-container {

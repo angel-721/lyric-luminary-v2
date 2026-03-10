@@ -2,7 +2,7 @@
 	import { Search, ChevronRight, InProgress } from 'carbon-icons-svelte';
 
 	interface Props {
-		onFetch: (lyrics: string, song?: { title: string; artist: string; thumbnail: string }) => void;
+		onFetch: (lyrics: string, song?: { title: string; artist: string; thumbnail: string }, blocked?: { message: string; geniusUrl: string }) => void;
 	}
 
 	let { onFetch }: Props = $props();
@@ -12,8 +12,6 @@
 	let searchResults = $state<Array<{ id: string; title: string; artist: string; thumbnail: string; url: string }>>([]);
 	let selectedSongId = $state<string | null>(null);
 	let errorMessage = $state('');
-	let blockedMessage = $state('');
-	let geniusUrl = $state('');
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	async function handleSearch() {
@@ -67,17 +65,14 @@
 	async function handleSongClick(song: { id: string; title: string; artist: string; thumbnail: string; url: string }) {
 		selectedSongId = song.id;
 		errorMessage = '';
-		blockedMessage = '';
-		geniusUrl = '';
 
 		try {
 			const response = await fetch(`/api/genius/lyrics?url=${encodeURIComponent(song.url)}`);
 			const data = await response.json();
 
 			if (data.blocked) {
-				// Genius is blocking us, show the sassy message with link
-				blockedMessage = data.message;
-				geniusUrl = data.geniusUrl;
+				// Genius is blocking us, signal parent to switch tabs and show the card
+				onFetch('', { title: song.title, artist: song.artist, thumbnail: song.thumbnail }, { message: data.message, geniusUrl: data.geniusUrl });
 				selectedSongId = null;
 			} else if (data.error) {
 				errorMessage = data.error;
@@ -113,12 +108,7 @@
 		</span>
 	</div>
 
-	{#if blockedMessage}
-		<div class="blocked-message">
-			<p>{blockedMessage}</p>
-			<p class="blocked-link">But you can still get them here: <a href={geniusUrl} target="_blank" rel="noopener noreferrer">Genius ↗</a></p>
-		</div>
-	{:else if errorMessage && !selectedSongId}
+	{#if errorMessage && !selectedSongId}
 		<p class="error-message">{errorMessage}</p>
 	{/if}
 
@@ -227,37 +217,6 @@
 		margin-top: 0.75rem;
 		color: var(--accent-dim);
 		font-size: 0.875rem;
-	}
-
-	.blocked-message {
-		margin-top: 0.75rem;
-		padding: 1rem;
-		background-color: var(--surface);
-		border-radius: 8px;
-		border-left: 3px solid var(--accent);
-	}
-
-	.blocked-message p {
-		font-family: 'IBM Plex Sans', sans-serif;
-		font-size: 0.875rem;
-		color: var(--text);
-		margin: 0;
-	}
-
-	.blocked-message .blocked-link {
-		margin-top: 0.5rem;
-		font-size: 0.875rem;
-		color: var(--subtext);
-	}
-
-	.blocked-message a {
-		color: var(--accent);
-		text-decoration: none;
-		font-weight: 600;
-	}
-
-	.blocked-message a:hover {
-		text-decoration: underline;
 	}
 
 	.results-list {
