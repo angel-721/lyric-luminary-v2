@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
-import { JSDOM } from "jsdom";
+import * as cheerio from "cheerio";
 
 async function scrapeLyrics(songUrl: string): Promise<string> {
   const controller = new AbortController();
@@ -30,29 +30,31 @@ async function scrapeLyrics(songUrl: string): Promise<string> {
   }
 
   const html = await response.text();
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+  const $ = cheerio.load(html);
 
-  const containers = Array.from(
-    document.querySelectorAll("[data-lyrics-container='true']")
-  );
+  const containers = $("[data-lyrics-container='true']");
 
   if (containers.length === 0) {
     throw new Error("No lyrics found on page.");
   }
 
-  const lyrics = containers
-    .map((container) => {
-      container.querySelectorAll("br").forEach((br) => {
-        br.replaceWith(dom.window.document.createTextNode("\n"));
-      });
-      container.querySelectorAll("div").forEach((div) => {
-        div.insertAdjacentText("afterend", "\n");
-      });
-      return container.textContent ?? "";
-    })
-    .join("\n")
-    .trim();
+  const lyricsParts: string[] = [];
+
+  containers.each((_, container) => {
+    const $container = $(container);
+
+    // Replace <br> tags with newlines
+    $container.find("br").replaceWith("\n");
+
+    // Add newlines after divs
+    $container.find("div").after("\n");
+
+    // Get text content
+    const text = $container.text() || "";
+    lyricsParts.push(text);
+  });
+
+  const lyrics = lyricsParts.join("\n").trim();
 
   if (!lyrics.length) {
     throw new Error("Lyrics container was empty.");
@@ -78,7 +80,7 @@ async function scrapeLyrics(songUrl: string): Promise<string> {
     if (trimmed.match(/^(This song|The song|It's about|They're about)/i)) return false;
     if (trimmed.match(/(written|produced|performed|recorded)/i)) return false;
 
-    const titleMatch = containers[0]?.textContent?.trim().split("\n")[0];
+    const titleMatch = containers.first().text().trim().split("\n")[0];
     if (titleMatch && trimmed === titleMatch && lines.indexOf(line) < 5) return false;
 
     if (trimmed.length > 200) return false;
