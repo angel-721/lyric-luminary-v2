@@ -27,7 +27,7 @@
 
 <footer class="footer">
 	<a
-		href="https://github.com/angel-721/lyric-luminary"
+		href="https://github.com/angel-721/lyric-luminary-v2"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="footer-link"
@@ -38,7 +38,7 @@
 	</a>
 	<span class="footer-divider">·</span>
 	<a
-		href="https://huggingface.co/spaces"
+		href="https://huggingface.co/spaces/angel-721/Song-Genere-Classifer"
 		target="_blank"
 		rel="noopener noreferrer"
 		class="footer-link"
