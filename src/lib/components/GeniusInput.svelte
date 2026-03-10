@@ -12,16 +12,18 @@
 	let searchResults = $state<Array<{ id: string; title: string; artist: string; thumbnail: string; url: string }>>([]);
 	let selectedSongId = $state<string | null>(null);
 	let errorMessage = $state('');
+	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	async function handleSearch() {
-		if (!searchQuery.trim()) {
+		if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+			searchResults = [];
+			errorMessage = '';
 			return;
 		}
 
 		isSearching = true;
 		errorMessage = '';
 		searchResults = [];
-		selectedSongId = null;
 
 		try {
 			const response = await fetch(`/api/genius?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -39,12 +41,40 @@
 		}
 	}
 
-	async function handleSongClick(songUrl: string, songId: string) {
-		selectedSongId = songId;
+	function handleInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		searchQuery = target.value;
+
+		// Clear results immediately if input is empty
+		if (!searchQuery.trim()) {
+			searchResults = [];
+			errorMessage = '';
+			if (debounceTimer) {
+				clearTimeout(debounceTimer);
+				debounceTimer = null;
+			}
+			return;
+		}
+
+		// Clear existing timer
+		if (debounceTimer) {
+			clearTimeout(debounceTimer);
+		}
+
+		// Only search if at least 2 characters
+		if (searchQuery.trim().length >= 2) {
+			debounceTimer = setTimeout(() => {
+				handleSearch();
+			}, 800);
+		}
+	}
+
+	async function handleSongClick(song: { id: string; title: string; artist: string; thumbnail: string; url: string }) {
+		selectedSongId = song.id;
 		errorMessage = '';
 
 		try {
-			const response = await fetch(`/api/genius/lyrics?url=${encodeURIComponent(songUrl)}`);
+			const response = await fetch(`/api/genius/lyrics?url=${encodeURIComponent(song.url)}`);
 			const data = await response.json();
 
 			if (data.error) {
@@ -62,37 +92,23 @@
 			selectedSongId = null;
 		}
 	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			handleSearch();
-		}
-	}
 </script>
 
 <div class="genius-search-container">
 	<div class="search-bar">
 		<input
-			bind:value={searchQuery}
+			value={searchQuery}
+			oninput={handleInput}
 			type="text"
 			placeholder="Search by song name..."
 			class="search-input"
 			disabled={isSearching}
-			onkeydown={handleKeydown}
 		/>
-		<button
-			onclick={handleSearch}
-			disabled={isSearching || !searchQuery.trim()}
-			class="search-button"
-			aria-label="Search"
-		>
-			{#if isSearching}
-				<InProgress size={20} class="spinning" />
-			{:else}
-				<Search size={20} />
-			{/if}
-		</button>
+		{#if isSearching}
+			<InProgress size={20} class="search-icon spinning" />
+		{:else}
+			<Search size={20} class="search-icon" />
+		{/if}
 	</div>
 
 	{#if errorMessage && !selectedSongId}
@@ -105,10 +121,10 @@
 				<div
 					class="result-row"
 					class:loading={selectedSongId === song.id}
-					onclick={() => handleSongClick(song.url, song.id)}
+					onclick={() => handleSongClick(song)}
 					role="button"
 					tabindex="0"
-					onkeydown={(e) => e.key === 'Enter' && handleSongClick(song.url, song.id)}
+					onkeydown={(e) => e.key === 'Enter' && handleSongClick(song)}
 				>
 					{#if song.thumbnail}
 						<img src={song.thumbnail} alt="" class="thumbnail" />
@@ -147,6 +163,7 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+		position: relative;
 	}
 
 	.search-input {
@@ -175,53 +192,13 @@
 		color: #666;
 	}
 
-	.search-button {
-		position: absolute;
-		right: 0.5rem;
-		padding: 0.5rem;
-		background-color: transparent;
-		color: #999;
-		border: none;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: color 0.2s;
-	}
-
-	.search-button:hover:not(:disabled) {
-		color: var(--text);
-	}
-
-	.search-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.search-bar {
-		position: relative;
-	}
-
-	.search-button {
+	.search-icon {
 		position: absolute;
 		right: 0.5rem;
 		top: 50%;
 		transform: translateY(-50%);
-		padding: 0.5rem;
-		background-color: transparent;
 		color: #999;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s;
-	}
-
-	.search-button:hover:not(:disabled) {
-		background-color: rgba(245, 166, 35, 0.1);
-		color: var(--accent);
+		pointer-events: none;
 	}
 
 	.spinning {
@@ -231,6 +208,16 @@
 	@keyframes spin {
 		to {
 			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
 		}
 	}
 
@@ -321,16 +308,6 @@
 		color: var(--accent);
 		flex-shrink: 0;
 		animation: pulse 1s ease-in-out infinite;
-	}
-
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.5;
-		}
 	}
 
 	.row-error {

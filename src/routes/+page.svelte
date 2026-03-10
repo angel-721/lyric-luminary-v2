@@ -113,7 +113,7 @@
 	<main class="main-content">
 		{#if activeTab === 'paste'}
 			{@const lyricError = errorMessage ? 'Lyrics cannot be empty' : ''}
-			<LyricInput {lyrics} error={lyricError} />
+			<LyricInput bind:lyrics error={lyricError} />
 		{:else}
 			<GeniusInput onFetch={handleGeniusFetch} />
 		{/if}
