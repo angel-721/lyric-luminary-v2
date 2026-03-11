@@ -13,6 +13,10 @@ Disallow: /config.php
 Disallow: /phpmyadmin/
 Disallow: /mysql/
 Disallow: /sql/
+Disallow: /.git/
+Disallow: /wordpress
+# These things won't stop trying to bother me
+
 
 # Slow down aggressive crawlers
 Crawl-delay: 1
