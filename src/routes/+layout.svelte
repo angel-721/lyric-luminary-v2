@@ -1,8 +1,12 @@
 <script lang="ts">
 	import './layout.css';
 	import { LogoGithub, MachineLearning, DataBase } from 'carbon-icons-svelte';
+	import { dev } from '$app/environment';
+	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 
 	let { children } = $props();
+	injectAnalytics({ mode: dev ? 'development' : 'production' });
+
 </script>
 
 <svelte:head>
