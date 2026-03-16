@@ -106,10 +106,6 @@
 				<Moon size={20} />
 			{/if}
 		</button>
-		<a href="/blog" class="blog-link">
-			<span>Blog</span>
-			<ArrowUpRight size={20} />
-		</a>
 	</div>
 	<div class="container-inner">
 	<header class="header">
@@ -267,21 +263,6 @@
 	}
 
 	.theme-toggle:hover {
-		color: var(--text);
-	}
-
-	.blog-link {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: var(--subtext);
-		text-decoration: none;
-		font-size: 0.875rem;
-		font-weight: 500;
-		transition: color 0.2s;
-	}
-
-	.blog-link:hover {
 		color: var(--text);
 	}
 
