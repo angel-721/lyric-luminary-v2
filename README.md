@@ -1,4 +1,16 @@
-# sv
+# Lyric Luminary Frontend(v2)
+
+Check out the original project that has the model training scripts [here](https://github.com/angel-721/lyric-luminary):
+
+The model is hosted this [hugging space](https://huggingface.co/spaces/angel-721/song-genre-classifier/tree/main) 🤗
+
+- P.S: The current hosted model is a bit out of date and tends to predict a lot of things as metal. I need to either retrain the model or find the old model that had a much higher accuracy.
+
+Project is hosted on [https://luminary.angelv.dev](https://luminary.angelv.dev/)
+
+
+
+## sv
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
