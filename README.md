@@ -1,6 +1,6 @@
 # Lyric Luminary Frontend(v2)
 
-Check out the original project that has the model training scripts [here](https://github.com/angel-721/lyric-luminary):
+Check out the original project that has the model training scripts [here](https://github.com/angel-721/lyric-luminary).
 
 The model is hosted this [hugging space](https://huggingface.co/spaces/angel-721/song-genre-classifier/tree/main) 🤗
 
@@ -9,6 +9,7 @@ The model is hosted this [hugging space](https://huggingface.co/spaces/angel-721
 Project is hosted on [https://luminary.angelv.dev](https://luminary.angelv.dev/)
 
 
+<img width="798" height="876" alt="screenshot" src="https://github.com/user-attachments/assets/99ac33b0-1a34-4cad-b76f-e1979f42310a" />
 
 ## sv
 
