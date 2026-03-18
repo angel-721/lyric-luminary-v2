@@ -3,7 +3,7 @@
 	import GeniusInput from '$lib/components/GeniusInput.svelte';
 	import Bulb from '$lib/components/Bulb.svelte';
 	import Result from '$lib/components/Result.svelte';
-	import { SendAlt, ArrowUpRight, Sun, Moon, Reset } from 'carbon-icons-svelte';
+	import { SendAlt, ArrowUpRight, Sun, Moon, Reset, Information } from 'carbon-icons-svelte';
 	import { theme, toggleTheme } from '$lib/stores/theme';
 
 	let activeTab = $state<'paste' | 'genius'>('genius');
@@ -14,6 +14,7 @@
 	let currentTheme = $state<'dark' | 'light'>('dark');
 	let geniusMetadata = $state<{ title: string; artist: string; thumbnail: string } | null>(null);
 	let blockedState = $state<{ message: string; geniusUrl: string } | null>(null);
+	let showModal = $state(false);
 
 	theme.subscribe((t) => (currentTheme = t));
 
@@ -99,6 +100,9 @@
 
 <div class="container">
 	<div class="top-links">
+		<button onclick={() => (showModal = true)} class="theme-toggle" aria-label="Show info">
+			<Information size={20} />
+		</button>
 		<button onclick={handleToggleTheme} class="theme-toggle" aria-label="Toggle theme">
 			{#if currentTheme === 'dark'}
 				<Sun size={20} />
@@ -187,6 +191,15 @@
 	</main>
 	</div>
 </div>
+
+{#if showModal}
+	<div class="modal-overlay" onclick={() => (showModal = false)} onkeydown={(e) => e.key === 'Escape' && (showModal = false)} role="presentation">
+		<div class="modal" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="modal-title">
+			<button class="modal-close" onclick={() => (showModal = false)} aria-label="Close modal">✕</button>
+			<p class="modal-message">The genre classifer model is currently out of date with a strong bias towards metal. It will be fixed soon! :)</p>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.light-cone {
@@ -460,5 +473,81 @@
 		white-space: pre-wrap;
 		overflow-y: auto;
 		max-height: 400px;
+	}
+
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.7);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		padding: 1rem;
+		animation: fade-in 0.2s ease-out;
+	}
+
+	.modal {
+		position: relative;
+		max-width: 400px;
+		padding: 2rem 1.5rem 1.5rem 1.5rem;
+		background-color: var(--surface);
+		border-radius: 12px;
+		animation: scale-in 0.2s ease-out;
+	}
+
+	.modal-close {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		background-color: transparent;
+		color: var(--subtext);
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.25rem;
+		transition: all 0.2s;
+	}
+
+	.modal-close:hover {
+		background-color: var(--overlay);
+		color: var(--text);
+	}
+
+	.modal-message {
+		font-family: 'IBM Plex Sans', sans-serif;
+		font-size: 1rem;
+		color: var(--text);
+		margin: 0;
+		line-height: 1.6;
+	}
+
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes scale-in {
+		from {
+			opacity: 0;
+			transform: scale(0.95);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
 	}
 </style>
