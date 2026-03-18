@@ -46,6 +46,7 @@
 				<span class="genre">{genre}</span>
 			</p>
 		{/if}
+		<p class="disclaimer">The model only uses lyrical content and isn't perfect.</p>
 	</div>
 {/if}
 
@@ -104,6 +105,15 @@
 
 	.emoji {
 		font-size: 3rem;
+	}
+
+	.disclaimer {
+		font-size: 0.75rem;
+		text-align: center;
+		color: var(--subtext);
+		margin: 0;
+		padding-top: 0;
+		padding-bottom: 1rem;
 	}
 
 	.error-text {
