@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './layout.css';
-	import { LogoGithub, MachineLearning, DataBase } from 'carbon-icons-svelte';
+	import { LogoGithub, MachineLearning, DataBase, User } from 'carbon-icons-svelte';
 	import { dev } from '$app/environment';
 	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 
@@ -61,5 +61,16 @@
 	>
 		<DataBase size={16} />
 		<span>Dataset</span>
+	</a>
+	<span class="footer-divider">·</span>
+	<a
+		href="https://angelv.dev"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="footer-link"
+		aria-label="Visit personal website"
+	>
+		<User size={16} />
+		<span>Personal Website</span>
 	</a>
 </footer>
